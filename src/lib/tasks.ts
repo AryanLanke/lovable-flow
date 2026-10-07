@@ -27,7 +27,7 @@ export function tintFor(tag?: string): Tint {
   if (!tag) return "slate";
   let h = 0;
   for (const c of tag.toLowerCase()) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  return TINTS[h % TINTS.length];
+  return TINTS[h % TINTS.length] ?? "slate";
 }
 
 export function formatEstimate(min?: number | null) {

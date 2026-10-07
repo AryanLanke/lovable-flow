@@ -80,8 +80,8 @@ function buildTools(sb: ReturnType<typeof db>) {
         tags: z.array(z.string()).nullable(),
       }),
       execute: async ({ id, ...rest }) => {
-        const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
-        for (const [k, v] of Object.entries(rest)) if (v !== null) patch[k] = v;
+        const patch: Database["public"]["Tables"]["tasks"]["Update"] = { updated_at: new Date().toISOString() };
+        for (const [k, v] of Object.entries(rest)) if (v !== null) (patch as Record<string, unknown>)[k] = v;
         const { data, error } = await sb.from("tasks").update(patch).eq("id", id).select().single();
         return error ? { error: error.message } : { task: data };
       },

@@ -22,7 +22,7 @@ const MAP: [RegExp, LucideIcon][] = [
   [/work|client/i, Briefcase],
 ];
 
-export function CategoryIcon({ tag, className }: { tag?: string; className?: string }) {
+export function CategoryIcon({ tag, className }: { tag?: string | undefined; className?: string }) {
   const Icon = (tag && MAP.find(([re]) => re.test(tag))?.[1]) || NotebookText;
   return <Icon className={className} strokeWidth={2.2} />;
 }
