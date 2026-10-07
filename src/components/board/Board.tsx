@@ -86,7 +86,8 @@ function Column({
 export function Board({ threadId }: { threadId?: string }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const { data: tasks = [], isLoading } = useQuery({ queryKey: tasksQueryKey, queryFn: fetchTasks });
+  const { data, isLoading } = useQuery({ queryKey: tasksQueryKey, queryFn: fetchTasks });
+  const tasks = useMemo(() => data ?? [], [data]);
   const [cols, setCols] = useState<Columns>(() => group([]));
   const [activeId, setActiveId] = useState<string | null>(null);
   const [search, setSearch] = useState("");

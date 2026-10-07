@@ -16,7 +16,7 @@ export function ChatPanel({ threadId }: { threadId: string }) {
   const qc = useQueryClient();
   const [showThreads, setShowThreads] = useState(false);
 
-  const { data: threads = [] } = useQuery({
+  const { data: threadsData } = useQuery({
     queryKey: threadsKey,
     queryFn: async () => {
       const { data } = await supabase.from("chat_threads").select("*").order("updated_at", { ascending: false });
@@ -50,6 +50,7 @@ export function ChatPanel({ threadId }: { threadId: string }) {
     if (id === threadId) navigate({ to: "/" });
   };
 
+  const threads = threadsData ?? [];
   const current = threads.find((t) => t.id === threadId);
 
   return (
