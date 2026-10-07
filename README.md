@@ -1,14 +1,17 @@
-# Welcome to your Lovable project
+# Lovable Flow
+
+What I would like you to do for me is go and build a Kanban board. I would like it to have the following features. I'd like to be able to have a complete, let's say, a to-do and in progress. And in fact, what I'd like you to do first of all is ask me questions to clarify your understanding just to make sure we crush the features down. I want the design to be gorgeous and interactive. I would also like to have an integrated AI chatbot that I can ask questions to at any time. I want to have that in there. And I also want the ability to save this information in a database so I can come back and use it whenever I want to in the future
+I would like you to build it in design and use this image as your reference style.
 
 This project was built with [Lovable](https://lovable.dev).
 
 ## Build with Lovable
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/0ff776cb-004a-4e18-ad15-927ff4061edc).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
@@ -20,10 +23,3 @@ cd <repository-name>
 npm i
 npm run dev
 ```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
