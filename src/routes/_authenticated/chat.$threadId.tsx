@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Board } from "@/components/board/Board";
 
-export const Route = createFileRoute("/chat/$threadId")({
+export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   head: () => ({
     meta: [
       { title: "Flow AI chat — Kanban board" },

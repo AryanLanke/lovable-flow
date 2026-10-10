@@ -37,7 +37,9 @@ export function ChatPanel({ threadId }: { threadId: string }) {
   });
 
   const newThread = async () => {
-    const { data } = await supabase.from("chat_threads").insert({}).select("id").single();
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return;
+    const { data } = await supabase.from("chat_threads").insert({ user_id: u.user.id }).select("id").single();
     if (data) {
       qc.invalidateQueries({ queryKey: threadsKey });
       navigate({ to: "/chat/$threadId", params: { threadId: data.id } });
@@ -47,7 +49,7 @@ export function ChatPanel({ threadId }: { threadId: string }) {
   const deleteThread = async (id: string) => {
     await supabase.from("chat_threads").delete().eq("id", id);
     await qc.invalidateQueries({ queryKey: threadsKey });
-    if (id === threadId) navigate({ to: "/" });
+    if (id === threadId) navigate({ to: "/board" });
   };
 
   const threads = threadsData ?? [];
@@ -71,7 +73,7 @@ export function ChatPanel({ threadId }: { threadId: string }) {
         <button onClick={newThread} title="New chat" className="rounded-lg p-2 text-muted-foreground hover:bg-accent">
           <Plus className="h-4 w-4" />
         </button>
-        <Link to="/" title="Close" className="rounded-lg p-2 text-muted-foreground hover:bg-accent">
+        <Link to="/board" title="Close" className="rounded-lg p-2 text-muted-foreground hover:bg-accent">
           <X className="h-4 w-4" />
         </Link>
 
@@ -127,7 +129,14 @@ function ChatWindow({ threadId, initial }: { threadId: string; initial: UIMessag
   const { messages, sendMessage, status, stop, error } = useChat({
     id: threadId,
     messages: initial,
-    transport: new DefaultChatTransport({ api: "/api/chat", body: { threadId } }),
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+      body: { threadId },
+      headers: async () => {
+        const { data } = await supabase.auth.getSession();
+        return data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {};
+      },
+    }),
     onFinish: () => {
       qc.invalidateQueries({ queryKey: tasksQueryKey });
       qc.invalidateQueries({ queryKey: ["chat_threads"] });

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import {
   DndContext,
   DragOverlay,
@@ -15,7 +15,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { AnimatePresence, motion } from "motion/react";
-import { Bot, LayoutGrid, Plus, Search, Sparkle } from "lucide-react";
+import { Bot, LayoutGrid, LogOut, Plus, Search, Sparkle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { COLUMNS, TINT_CLASSES, fetchTasks, tasksQueryKey, tintFor, type Status, type Task } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,47 @@ import { SortableTaskCard, TaskCardView } from "./TaskCard";
 import { TaskDialog, type TaskDraft } from "./TaskDialog";
 import { CategoryIcon } from "./CategoryIcon";
 import { ChatPanel } from "./ChatPanel";
+
+function UserMenu() {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return null;
+      const { data } = await supabase.from("profiles").select("*").eq("id", u.user.id).maybeSingle();
+      return data ?? { id: u.user.id, display_name: u.user.email ?? "You", avatar_url: null, created_at: "" };
+    },
+  });
+
+  const signOut = async () => {
+    await qc.cancelQueries();
+    qc.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", search: { redirect: undefined }, replace: true });
+  };
+
+  const name = profile?.display_name || "You";
+  return (
+    <div className="flex items-center gap-2">
+      {profile?.avatar_url ? (
+        <img src={profile.avatar_url} alt={name} className="h-9 w-9 rounded-xl object-cover ring-1 ring-border" />
+      ) : (
+        <div className="grid h-9 w-9 place-items-center rounded-xl bg-secondary text-sm font-bold ring-1 ring-border">
+          {name.slice(0, 1).toUpperCase()}
+        </div>
+      )}
+      <button
+        onClick={signOut}
+        title="Sign out"
+        className="grid h-9 w-9 place-items-center rounded-xl text-muted-foreground ring-1 ring-border transition hover:bg-accent hover:text-foreground"
+      >
+        <LogOut className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
 
 type Columns = Record<Status, string[]>;
 
@@ -175,8 +216,10 @@ export function Board({ threadId }: { threadId?: string }) {
     if (dialog.task) {
       await supabase.from("tasks").update({ ...d, updated_at: new Date().toISOString() }).eq("id", dialog.task.id);
     } else {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return;
       const pos = Math.max(0, ...tasks.filter((t) => t.status === d.status).map((t) => t.position)) + 1;
-      await supabase.from("tasks").insert({ ...d, position: pos });
+      await supabase.from("tasks").insert({ ...d, position: pos, user_id: u.user.id });
     }
     setDialog((x) => ({ ...x, open: false }));
     qc.invalidateQueries({ queryKey: tasksQueryKey });
@@ -192,7 +235,9 @@ export function Board({ threadId }: { threadId?: string }) {
     const { data } = await supabase.from("chat_threads").select("id").order("updated_at", { ascending: false }).limit(1);
     let id = data?.[0]?.id;
     if (!id) {
-      const { data: created } = await supabase.from("chat_threads").insert({}).select("id").single();
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return;
+      const { data: created } = await supabase.from("chat_threads").insert({ user_id: u.user.id }).select("id").single();
       id = created?.id;
     }
     if (id) navigate({ to: "/chat/$threadId", params: { threadId: id } });
@@ -282,6 +327,7 @@ export function Board({ threadId }: { threadId?: string }) {
             >
               <Sparkle className="h-4 w-4" /> Ask AI
             </button>
+            <UserMenu />
           </div>
         </header>
 
@@ -338,8 +384,6 @@ export function Board({ threadId }: { threadId?: string }) {
         onSave={save}
         onDelete={remove}
       />
-      {/* keep Link import used for typed routing */}
-      <Link to="/" className="hidden" aria-hidden />
     </div>
   );
 }
