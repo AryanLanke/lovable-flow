@@ -38,6 +38,7 @@ function Landing() {
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
           to="/auth"
+          search={{ redirect: undefined }}
           className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_-6px] shadow-primary transition hover:brightness-110"
         >
           <Sparkle className="h-4 w-4" /> Sign in to your board
