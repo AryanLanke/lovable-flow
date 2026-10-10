@@ -15,6 +15,13 @@
       "when": 1791626893519,
       "tag": "0001_add_auth_profiles_and_ownership",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791626922332,
+      "tag": "0002_drop_public_policies",
+      "breakpoints": true
     }
   ]
 }
