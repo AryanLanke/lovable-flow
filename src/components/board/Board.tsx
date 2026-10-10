@@ -327,6 +327,7 @@ export function Board({ threadId }: { threadId?: string }) {
             >
               <Sparkle className="h-4 w-4" /> Ask AI
             </button>
+            <UserMenu />
           </div>
         </header>
 
@@ -383,8 +384,6 @@ export function Board({ threadId }: { threadId?: string }) {
         onSave={save}
         onDelete={remove}
       />
-      {/* keep Link import used for typed routing */}
-      <Link to="/" className="hidden" aria-hidden />
     </div>
   );
 }
