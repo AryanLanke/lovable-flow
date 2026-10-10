@@ -5,16 +5,18 @@ import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 import { createLovableAiGatewayRunIdFetch, getLovableAiGatewayRunId } from "./run-id.server";
 
-function db() {
+function db(token: string) {
   const url = process.env["SUPABASE_URL"]!;
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
   return createClient<Database>(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: {
+      headers: { Authorization: `Bearer ${token}` },
       fetch: (input, init) => {
         const h = new Headers(init?.headers);
         if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
         h.set("apikey", key);
+        if (!h.get("Authorization")) h.set("Authorization", `Bearer ${token}`);
         return fetch(input, { ...init, headers: h });
       },
     },
@@ -102,10 +104,19 @@ export async function handleChat(request: Request) {
   const { messages, threadId } = body;
   if (!threadId || !Array.isArray(messages)) return new Response("Bad request", { status: 400 });
 
+  const auth = request.headers.get("authorization");
+  const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+  if (!token || token.split(".").length !== 3) return new Response("Unauthorized", { status: 401 });
+
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) return new Response("AI is not configured", { status: 500 });
 
-  const sb = db();
+  const sb = db(token);
+  const { data: claims, error: claimsError } = await sb.auth.getClaims(token);
+  if (claimsError || !claims?.claims?.sub) return new Response("Unauthorized", { status: 401 });
+
+  const { data: thread } = await sb.from("chat_threads").select("id").eq("id", threadId).maybeSingle();
+  if (!thread) return new Response("Not found", { status: 404 });
   const runIdFetch = createLovableAiGatewayRunIdFetch(getLovableAiGatewayRunId(request));
   const provider = createOpenAI({
     baseURL: "https://ai.gateway.lovable.dev/v1",
