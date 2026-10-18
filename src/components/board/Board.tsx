@@ -279,13 +279,6 @@ export function Board({ threadId }: { threadId?: string }) {
             );
           })}
         </div>
-        <button
-          onClick={openChat}
-          title="Ask Flow AI"
-          className="grid h-14 w-14 place-items-center rounded-2xl bg-card text-primary ring-1 ring-border transition hover:bg-accent"
-        >
-          <Bot className="h-6 w-6" />
-        </button>
       </aside>
 
       {/* Main */}
