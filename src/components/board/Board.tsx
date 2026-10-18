@@ -320,6 +320,7 @@ export function Board({ threadId }: { threadId?: string }) {
             >
               <Sparkle className="h-4 w-4" /> Ask AI
             </button>
+            <ThemeToggle />
             <UserMenu />
           </div>
         </header>
