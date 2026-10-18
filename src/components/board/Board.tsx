@@ -15,7 +15,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { AnimatePresence, motion } from "motion/react";
-import { Bot, LayoutGrid, LogOut, Plus, Search, Sparkle } from "lucide-react";
+import { LayoutGrid, LogOut, Moon, Plus, Search, Sparkle, Sun } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { COLUMNS, TINT_CLASSES, fetchTasks, tasksQueryKey, tintFor, type Status, type Task } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,34 @@ import { SortableTaskCard, TaskCardView } from "./TaskCard";
 import { TaskDialog, type TaskDraft } from "./TaskDialog";
 import { CategoryIcon } from "./CategoryIcon";
 import { ChatPanel } from "./ChatPanel";
+
+function ThemeToggle() {
+  const [light, setLight] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("flow.theme");
+    const isLight = stored === "light";
+    document.documentElement.classList.toggle("light", isLight);
+    setLight(isLight);
+  }, []);
+
+  const toggle = () => {
+    const next = !light;
+    setLight(next);
+    document.documentElement.classList.toggle("light", next);
+    localStorage.setItem("flow.theme", next ? "light" : "dark");
+  };
+
+  return (
+    <button
+      onClick={toggle}
+      title={light ? "Switch to dark theme" : "Switch to light theme"}
+      className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-foreground ring-1 ring-border transition hover:bg-accent"
+    >
+      {light ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+    </button>
+  );
+}
 
 function UserMenu() {
   const navigate = useNavigate();
@@ -279,13 +307,6 @@ export function Board({ threadId }: { threadId?: string }) {
             );
           })}
         </div>
-        <button
-          onClick={openChat}
-          title="Ask Flow AI"
-          className="grid h-14 w-14 place-items-center rounded-2xl bg-card text-primary ring-1 ring-border transition hover:bg-accent"
-        >
-          <Bot className="h-6 w-6" />
-        </button>
       </aside>
 
       {/* Main */}
@@ -327,6 +348,7 @@ export function Board({ threadId }: { threadId?: string }) {
             >
               <Sparkle className="h-4 w-4" /> Ask AI
             </button>
+            <ThemeToggle />
             <UserMenu />
           </div>
         </header>
