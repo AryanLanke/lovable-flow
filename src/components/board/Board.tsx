@@ -15,7 +15,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { AnimatePresence, motion } from "motion/react";
-import { Bot, LayoutGrid, LogOut, Plus, Search, Sparkle } from "lucide-react";
+import { LayoutGrid, LogOut, Moon, Plus, Search, Sparkle, Sun } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { COLUMNS, TINT_CLASSES, fetchTasks, tasksQueryKey, tintFor, type Status, type Task } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
