@@ -24,6 +24,34 @@ import { TaskDialog, type TaskDraft } from "./TaskDialog";
 import { CategoryIcon } from "./CategoryIcon";
 import { ChatPanel } from "./ChatPanel";
 
+function ThemeToggle() {
+  const [light, setLight] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("flow.theme");
+    const isLight = stored === "light";
+    document.documentElement.classList.toggle("light", isLight);
+    setLight(isLight);
+  }, []);
+
+  const toggle = () => {
+    const next = !light;
+    setLight(next);
+    document.documentElement.classList.toggle("light", next);
+    localStorage.setItem("flow.theme", next ? "light" : "dark");
+  };
+
+  return (
+    <button
+      onClick={toggle}
+      title={light ? "Switch to dark theme" : "Switch to light theme"}
+      className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-foreground ring-1 ring-border transition hover:bg-accent"
+    >
+      {light ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+    </button>
+  );
+}
+
 function UserMenu() {
   const navigate = useNavigate();
   const qc = useQueryClient();
